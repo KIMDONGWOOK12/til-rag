@@ -53,5 +53,5 @@ rag_chain = (
 )
 
 if __name__ == "__main__":
-    question = "김치찌개 맛있게 끓이는 법 알려줘"
+    question = "RAG가 뭐야"
     print(rag_chain.invoke(question))
