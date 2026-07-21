@@ -10,6 +10,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langgraph.graph import START, END, StateGraph, MessagesState
 from langchain_core.tools import tool
 from langgraph.prebuilt import ToolNode, tools_condition
+from langchain_core.messages import SystemMessage, HumanMessage
 
 
 embeddings = GoogleGenerativeAIEmbeddings(
@@ -43,7 +44,7 @@ model = ChatGoogleGenerativeAI(
     model = os.environ["GOOGLE_MODEL"],
     google_api_key = os.environ["GOOGLE_API_KEY"],
 )
-model_with_tools = model.bind_tools(tools)
+model_with_tools = model.bind_tools(tools)  
 
 SYSTEM_PROMPT = (
     "당신은 개인 학습 기록인 TIL 기반 QA 시스템입니다.\n"
@@ -56,7 +57,6 @@ SYSTEM_PROMPT = (
 def agent(state: MessagesState) -> dict:
     messages = state["messages"]
     if not any(m.type == "system" for m in messages):
-        from langchain_core.messages import SystemMessage
         messages = [SystemMessage(content=SYSTEM_PROMPT)] + messages
     response = model_with_tools.invoke(messages)
     return {"messages" : [response]}
@@ -73,10 +73,12 @@ builder.add_edge("tools", "agent")
 graph = builder.compile()
 
 if __name__ == "__main__":
-    from langchain_core.messages import HumanMessage
-
     result1 = graph.invoke({"messages" : [HumanMessage(content="RAG가 뭐야")]})
     print("[검색 필요]", result1["messages"][-1].content)
 
     result2 = graph.invoke({"messages" : [HumanMessage(content="이번주 비가 너무 많이오네")]})
     print("[검색 필요]", result2["messages"][-1].content)
+
+    '''mermaid_code = graph.get_graph().draw_mermaid()
+    print("\n=== Mermaid 다이어그램 코드 ===")
+    print(mermaid_code)'''

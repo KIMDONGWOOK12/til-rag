@@ -31,13 +31,36 @@
 | 3 | 판단 근거 실증 | "오늘 너무 힘들고 피곤했다" 같은 일지성 문장에서 검색 생략 확인 | ✅ 완료 |
 | 3 | ReAct Agent 확장 | `bind_tools` + `ToolNode` + `tools_condition` (`rag_graph.py`) | ✅ 완료 |
 | 3 | Agent 자율판단 검증 | 지식 질문 → 도구 호출 / 잡담 → 도구 미호출 분기 확인 | ✅ 완료 |
-| 4 | FastAPI 배포 | REST API 래핑 | 🚧 진행 예정 |
+| 4 | FastAPI 배포 | REST API 래핑 | ✅ 완료  |
 
+
+## Architecture
+
+Agent 그래프 구조 (`rag_graph.py`):
+
+```mermaid
+graph TD;
+        __start__([<p>__start__</p>]):::first
+        agent(agent)
+        tools(tools)
+        __end__([<p>__end__</p>]):::last
+        __start__ --> agent;
+        agent -.-> __end__;
+        agent -.-> tools;
+        tools --> agent;
+        classDef default fill:#f2f0ff,line-height:1.2
+        classDef first fill-opacity:0
+        classDef last fill:#bfb6fc
+```
+
+- 실선(`-->`): 고정된 흐름
+- 점선(`-.->`): `tools_condition`이 판단하는 조건부 분기
+- `tools → agent`로 되돌아가는 순환 구조가 이 그래프를 Workflow가 아닌 **Agent**로 만드는 핵심 요소
 ---
 
 ## 검증 결과 요약
 
-같은 두 질문을 4개 구현체(`rag.py` → `rag_lc.py` → `rag_graph.py`)에
+같은 두 질문을 3개 구현체(`rag.py` → `rag_lc.py` → `rag_graph.py`)에
 동일하게 던져, **로직 전환 과정에서 동작이 깨지지 않았는지** 확인했습니다.
 
 | 질문 | rag.py (순수) | rag_lc.py (LangChain) | rag_graph.py (Workflow) | rag_graph.py (Agent) |
@@ -105,7 +128,7 @@ uv run rag_lc.py
 uv run rag_graph.py
 
 # 5. LangGraph ReAct Agent 실행 (bind_tools + ToolNode)
-uv run rag_agent.py
+uv run rag_graph.py
 ```
 
 ---
