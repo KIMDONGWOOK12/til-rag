@@ -1,0 +1,9 @@
+services:
+  til-rag:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./chroma_db:/app/chroma_db
+    env_file:
+      - .env

@@ -1,9 +1,16 @@
+from pathlib import Path
+
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from langchain_core.messages import HumanMessage
 from rag_graph import graph
 
 app = FastAPI()
+
+@app.get("/")
+def serve_index():
+    return FileResponse(Path(__file__).parent / "index.html")
 
 class Question(BaseModel):
     question : str
