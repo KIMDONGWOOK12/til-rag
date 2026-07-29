@@ -27,7 +27,9 @@ vectorstore = Chroma(
 retriever = vectorstore.as_retriever(search_kwargs={"k":3})
 
 def format_docs(docs):
-    return "\n".join(f"[문서{i}]\n{doc.page_content}"for i, doc in enumerate(docs, 1))
+    return "\n".join(
+        f"[{doc.metadata['source']}]\n{doc.page_content}" for doc in docs
+    )
 
 #search 도구
 
@@ -51,7 +53,8 @@ SYSTEM_PROMPT = (
     "지식 질문이면 search_til 도구로 TIL 문서를 검색해 그 내용만 근거로 답하세요.\n"
     "문서에 답이 없으면 \"제 TIL에서 해당 정보를 찾을 수 없습니다\"라고 답하세요.\n"
     "잡담이나 감정 표현처럼 검색이 필요 없는 말에는 도구를 쓰지 말고 자연스럽게 응답하세요.\n"
-    "답변 시 근거가 된 문서 번호를 함께 표시하고, 3문장 이내로 작성하세요."
+    "답변 시 근거가 된 문서의 파일명을 대괄호로 표시하고 (예: [26-06-17.md]), "
+    "3문장 이내로 작성하세요."
 )
 
 def agent(state: MessagesState) -> dict:

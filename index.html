@@ -301,17 +301,32 @@
     return el;
   }
 
-  // answer 텍스트에서 [문서1], [문서2] 같은 패턴을 찾아 출처 태그로 뽑아낸다.
+  const DOC_REF_RE = /\[(\d{2}-\d{2}-\d{2}(?:_\d+)?\.md)\]/g;
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  // answer 텍스트에서 [26-06-15.md] 같은 패턴을 찾아 출처 태그로 뽑아낸다.
   function extractSources(text) {
-    const matches = text.match(/\[문서\s*\d+\]/g) || [];
-    const unique = [...new Set(matches.map(m => m.replace(/\s+/g, '')))];
+    const matches = text.match(DOC_REF_RE) || [];
+    const unique = [...new Set(matches.map(m => m.slice(1, -1)))];
     return unique;
+  }
+
+  // answer 텍스트를 이스케이프한 뒤, [26-06-15.md] 패턴만 새 탭 링크로 바꾼다.
+  function linkifyDocRefs(text) {
+    return escapeHtml(text).replace(DOC_REF_RE, (match, filename) =>
+      `[<a href="/docs/${filename}" target="_blank" rel="noopener">${filename}</a>]`
+    );
   }
 
   function renderBotMessage(el, text, isError) {
     const bubble = el.querySelector('.bubble');
     bubble.classList.toggle('error', !!isError);
-    bubble.textContent = text;
+    bubble.innerHTML = isError ? escapeHtml(text) : linkifyDocRefs(text);
 
     if (!isError) {
       const sources = extractSources(text);
