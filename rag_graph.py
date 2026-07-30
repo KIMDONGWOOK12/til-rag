@@ -68,10 +68,10 @@ builder = StateGraph(MessagesState)
 
 builder.add_node("agent", agent)
 builder.add_node("tools", ToolNode(tools=tools))
-
 builder.add_edge(START, "agent")
 builder.add_conditional_edges("agent", tools_condition, ["tools", END])
 builder.add_edge("tools", "agent")
+
 
 graph = builder.compile()
 
@@ -85,3 +85,4 @@ if __name__ == "__main__":
     '''mermaid_code = graph.get_graph().draw_mermaid()
     print("\n=== Mermaid 다이어그램 코드 ===")
     print(mermaid_code)'''
+    
