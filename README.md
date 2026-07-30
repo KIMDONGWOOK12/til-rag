@@ -39,7 +39,7 @@
 | 6 | Wireshark를 통한 HTTP/HTTPS 통신 캡처 분석 | ✅ 완료  |
 | 7 | Docker 컨테이너화 + Docker Compose 실행 | ✅ 완료  |
 | 7 | AWS EC2 배포 (외부 접근 가능 구성) | ✅ 완료  |
-| 8 | GitHub Actions 기반 CI/CD 파이프라인 구축 | ✅ 완료  |
+| 7 | GitHub Actions 기반 CI/CD 파이프라인 구축 | ✅ 완료  |
 
 
 
