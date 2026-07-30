@@ -32,6 +32,15 @@
 | 3 | ReAct Agent 확장 | `bind_tools` + `ToolNode` + `tools_condition` (`rag_graph.py`) | ✅ 완료 |
 | 3 | Agent 자율판단 검증 | 지식 질문 → 도구 호출 / 잡담 → 도구 미호출 분기 확인 | ✅ 완료 |
 | 4 | FastAPI 배포 | REST API 래핑 | ✅ 완료  |
+| 5 | Qwen 모델 LoRA·QLoRA Fine-Tuning (코랩으로 별도) | ✅ 완료  |
+| 5 | Post-Training Quantization 적용 및 양자화 전후 성능·메모리 비교 (코랩으로 별도) | ✅ 완료  |
+| 5 | GGUF 포맷 변환 및 Llama.cpp 추론 (코랩으로 별도) | ✅ 완료  |
+| 6 | Unix 환경 프로세스·스레드·메모리 상태 분석 보고서 | ✅ 완료  |
+| 6 | Wireshark를 통한 HTTP/HTTPS 통신 캡처 분석 | ✅ 완료  |
+| 7 | Docker 컨테이너화 + Docker Compose 실행 | ✅ 완료  |
+| 7 | AWS EC2 배포 (외부 접근 가능 구성) | ✅ 완료  |
+| 8 | GitHub Actions 기반 CI/CD 파이프라인 구축 | ✅ 완료  |
+
 
 
 ## Architecture
@@ -129,8 +138,20 @@ uv run rag_graph.py
 
 # 5. LangGraph ReAct Agent 실행 (bind_tools + ToolNode)
 uv run rag_graph.py
+
+# 6. FastAPI 서버
+uv run uvicorn main:app --host 0.0.0.0 --port 8000
+
+# 7. Docker로 실행
+docker compose up -d
 ```
 
+
+## 배포된 서버
+```
+http://32.236.37.151:8000/docs
+```
+- 인스턴스 중지 상태로 인한 재시작시 변결 될 예정
 ---
 
 ## Data Source
@@ -145,11 +166,5 @@ uv run rag_graph.py
 
 ## 앞으로의 계획 (개인 프로젝트 외 커리큘럼)
 
-- Qwen 모델 LoRA·QLoRA Fine-Tuning
-- Post-Training Quantization 적용 및 양자화 전후 성능·메모리 비교
-- GGUF 포맷 변환 및 Llama.cpp 추론
-- Unix 환경 프로세스·스레드·메모리 상태 분석 보고서
-- Wireshark를 통한 HTTP/HTTPS 통신 캡처 분석
-- Docker 컨테이너화 + Docker Compose 실행
-- AWS EC2 배포 (외부 접근 가능 구성)
-- GitHub Actions 기반 CI/CD 파이프라인 구축
+- 프론트엔드 부분
+- TIL -> 야구로 데이터 바꿔서 재학습 시킨 후 구조 다시 짜보기
