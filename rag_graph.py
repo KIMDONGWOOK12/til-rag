@@ -15,7 +15,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 embeddings = GoogleGenerativeAIEmbeddings(
     model = "models/gemini-embedding-001",
-    google_api_key = os.environ["GOOGLE_API_KEY"],
+    google_api_key = os.environ["GOOGLE_API_KEY"]
 )
 
 vectorstore = Chroma(
