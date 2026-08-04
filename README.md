@@ -1,12 +1,14 @@
 # Title: TIL-RAG — 개인 학습 기록(TIL) 기반 RAG 질의응답 시스템
 
 ## Description
+
 부트캠프 학습 과정에서 작성한 TIL(Today I Learned) 마크다운 문서를 지식 베이스로 삼아,
 **순수 구현 → LangChain → LangGraph** 순서로 동일한 RAG 파이프라인을 세 번 재구축하며
 각 프레임워크가 왜 필요한지, 무엇을 대체하는지를 직접 코드로 검증한 개인 학습 프로젝트입니다.
 
 기존에 완성한 [`dev-docs-rag-agent`](https://github.com/KIMDONGWOOK12/dev-docs-rag-agent)(8주차 제출물)와
-별개로, **AI 의존 없이 바닥부터 이해하고 다시 짜보기 위해** 자발적으로 시작하였으며, 추 후 이 프로젝트를 개인 프로젝트로 나가려고 합니다.
+별개로, **AI 의존 없이 바닥부터 이해하고 다시 짜보기 위해** 자발적으로 시작하였으며,
+추후 이 프로젝트를 개인 프로젝트로 발전시켜 나가고 있습니다.
 
 ---
 
@@ -14,12 +16,12 @@
 
 | Phase | 항목 | 내용 | 상태 |
 |---|---|---|---|
-| 0 | TIL 문서 작성 | 부트캠프 학습 기록 42개 마크다운 작성 | ✅ 완료 |
+| 0 | TIL 문서 작성 | 부트캠프 학습 기록 (TIL)42개 마크다운 작성 | ✅ 완료 |
 | 0 | 전처리 파이프라인 | 유니코드 정규화(NFC), 제어문자 제거, 공백 정리 | ✅ 완료 |
 | 0 | Chunking | 고정 길이 분할 (chunk_size=500, overlap=50) | ✅ 완료 |
 | 0 | 인덱싱 | Gemini 임베딩 + ChromaDB 저장 (299개 청크, `collection_name="til_rag"`) | ✅ 완료 |
 | 1 | 순수 RAG 구현 | `retrieve()` / `generate()` 직접 구현 (`rag.py`) | ✅ 완료 |
-| 1 | 프롬프트 설계 | 5원칙 (근거 문서만 사용 / 모르면 거절 / 문서번호 표시 / 3문장 제한) | ✅ 완료 |
+| 1 | 프롬프트 설계 | 5원칙 (근거 문서만 사용 / 모르면 거절 / 출처 표시 / 3문장 제한) | ✅ 완료 |
 | 1 | 환각 방지 검증 | 무관 질문(예: 김치찌개 레시피) 시 "찾을 수 없음" 응답 확인 | ✅ 완료 |
 | 1 | RAG 평가 | `evaluate.py` — 규칙 기반 vs LLM-as-Judge 비교 평가 | ✅ 완료 |
 | 2 | LangChain 마이그레이션 | 기존 Chroma 인덱스 재오픈 (재인덱싱 없이 전환) (`rag_lc.py`) | ✅ 완료 |
@@ -27,21 +29,23 @@
 | 2 | LCEL 체인 조립 | `retriever \| format_docs`, `RunnablePassthrough` | ✅ 완료 |
 | 2 | 동일 동작 검증 | rag.py 대비 동일 질문·동일 결과(RAG 정의, 환각방지) 확인 | ✅ 완료 |
 | 3 | State/Node/Edge 설계 | `TypedDict` 기반 State, 단순 선형 그래프 | ✅ 완료 |
-| 3 | judge 노드 + 조건부 라우팅 | LLM이 검색 필요 여부 판단 → `add_conditional_edges` 분기 (`rag_graph.py`) | ✅ 완료 |
+| 3 | judge 노드 + 조건부 라우팅 | LLM이 검색 필요 여부 판단 → `add_conditional_edges` 분기 | ✅ 완료 |
 | 3 | 판단 근거 실증 | "오늘 너무 힘들고 피곤했다" 같은 일지성 문장에서 검색 생략 확인 | ✅ 완료 |
 | 3 | ReAct Agent 확장 | `bind_tools` + `ToolNode` + `tools_condition` (`rag_graph.py`) | ✅ 완료 |
 | 3 | Agent 자율판단 검증 | 지식 질문 → 도구 호출 / 잡담 → 도구 미호출 분기 확인 | ✅ 완료 |
-| 4 | FastAPI 배포 | REST API 래핑 | ✅ 완료  |
-| 5 | Qwen 모델 LoRA·QLoRA Fine-Tuning (코랩으로 별도) | ✅ 완료  |
-| 5 | Post-Training Quantization 적용 및 양자화 전후 성능·메모리 비교 (코랩으로 별도) | ✅ 완료  |
-| 5 | GGUF 포맷 변환 및 Llama.cpp 추론 (코랩으로 별도) | ✅ 완료  |
-| 6 | Unix 환경 프로세스·스레드·메모리 상태 분석 보고서 | ✅ 완료  |
-| 6 | Wireshark를 통한 HTTP/HTTPS 통신 캡처 분석 | ✅ 완료  |
-| 7 | Docker 컨테이너화 + Docker Compose 실행 | ✅ 완료  |
-| 7 | AWS EC2 배포 (외부 접근 가능 구성) | ✅ 완료  |
-| 7 | GitHub Actions 기반 CI/CD 파이프라인 구축 | ✅ 완료  |
+| 4 | FastAPI 배포 | REST API 래핑 (`main.py`) | ✅ 완료 |
+| 4 | 프론트엔드 | 단일 파일 채팅 UI, 출처 파일명 클릭 시 원본 문서 열람 (`index.html`) | ✅ 완료 |
+| 5 | Qwen QLoRA Fine-Tuning | Colab GPU 환경에서 별도 진행 | ✅ 완료 |
+| 5 | Post-Training Quantization | 양자화 전후 성능·메모리 비교 | ✅ 완료 |
+| 5 | GGUF 변환 + Llama.cpp 추론 | Colab에서 별도 진행 | ✅ 완료 |
+| 6 | Unix 프로세스·스레드·메모리 분석 | `ps` / `top` / `lsof` / `vmmap` 분석 보고서 | ✅ 완료 |
+| 6 | Wireshark 통신 캡처 분석 | loopback + 서로 다른 두 기기 간 HTTP 캡처 | ✅ 완료 |
+| 7 | Docker 컨테이너화 | Dockerfile + Docker Compose | ✅ 완료 |
+| 7 | AWS EC2 배포 | Docker Hub 경유, 외부 접근 가능 구성 | ✅ 완료 |
+| 7 | GitHub Actions CI/CD | push 시 자동 빌드·배포 파이프라인 | ✅ 완료 |
+| 8 | 코드리뷰 QLoRA + vLLM 서빙 | 확장 프로젝트 (`code_review/`) | 🔄 진행 중 |
 
-
+---
 
 ## Architecture
 
@@ -65,6 +69,7 @@ graph TD;
 - 실선(`-->`): 고정된 흐름
 - 점선(`-.->`): `tools_condition`이 판단하는 조건부 분기
 - `tools → agent`로 되돌아가는 순환 구조가 이 그래프를 Workflow가 아닌 **Agent**로 만드는 핵심 요소
+
 ---
 
 ## 검증 결과 요약
@@ -87,7 +92,7 @@ graph TD;
 ### Sub
 - 검색 필요 여부 자율 판단 (judge 노드 / Agent의 도구 선택)
 - 문서 근거가 없을 시 환각 방지 응답 ("제 TIL에서 해당 정보를 찾을 수 없습니다")
-- 답변 시 근거 문서 번호 인용
+- 답변 시 근거 문서 파일명 인용, 클릭 시 원본 TIL 문서 열람
 - 순수구현 / LangChain / LangGraph(Workflow) / LangGraph(Agent) 4단계 비교 구조 유지
 
 ---
@@ -102,6 +107,39 @@ graph TD;
   무거운 연산(LLM 호출)은 노드 안에서 처리하는 것이 LangGraph의 권장 패턴.
 - **judge+조건분기는 Workflow, bind_tools+ToolNode는 Agent**: 개발자가 실행 경로를 코드로 고정했는지(Workflow),
   LLM이 실행 중 다음 행동을 스스로 선택하는지(Agent)로 두 그래프를 구분해 설계.
+- **출처를 문서 번호가 아닌 파일명으로 표시**: `format_docs()`에서 `doc.metadata['source']`를 사용해
+  실제 파일명(`[26-06-17.md]`)을 노출 → 프론트엔드에서 클릭 가능한 링크로 변환, 답변 근거 추적성 확보.
+
+---
+
+## 확장 프로젝트 — 코드리뷰 QLoRA + vLLM 서빙 (`code_review/`)
+
+TIL-RAG와 같은 RAG 구조를 **다른 도메인**에 적용하고, 생성 모델까지 직접 학습해본 확장 실습입니다.
+
+| | TIL-RAG | 코드리뷰 프로젝트 |
+|---|---|---|
+| 도메인 | 개인 학습 기록(TIL 마크다운) | GitHub PR 리뷰 코멘트 |
+| 생성 모델 | Gemini API (외부 서비스) | Qwen2.5-1.5B를 QLoRA로 직접 파인튜닝 → vLLM 서빙 |
+| 검색 | ChromaDB (299청크) | ChromaDB + 유사도 threshold 필터 |
+
+### 진행 상태
+
+| 항목 | 상태 |
+|---|---|
+| 데이터 수집 (GitHub API, 5개 저장소) | ✅ 1334개 확보 |
+| QLoRA 학습 (Qwen2.5-1.5B) | ✅ v1 → v2 (과적합 개선) |
+| Adapter Merge (FP16 베이스) | ✅ 완료 |
+| vLLM 서빙 (OpenAI 호환 API) | ✅ 완료 |
+| RAG 결합 (검색 + vLLM 생성) | ✅ 완료 |
+| 유사도 threshold 필터 | ✅ 완료 (무관 컨텍스트 차단) |
+| 확대된 데이터로 재학습 | 🔄 진행 중 |
+
+### 데이터 출처
+
+`langchain-ai/langgraph`, `langchain-ai/langchain`, `pallets/flask`,
+`psf/requests`, `tiangolo/fastapi` — merge된 PR의 review_comments 수집
+
+자세한 내용은 [`code_review/README.md`](code_review/README.md) 참고.
 
 ---
 
@@ -111,7 +149,10 @@ graph TD;
 - 0.1.0: 순수 RAG 구현 — TIL 42개, 299청크 인덱싱, 환각 방지 검증 (`rag.py`)
 - 0.2.0: LangChain 마이그레이션 — LCEL 체인 (`rag_lc.py`)
 - 0.3.0: LangGraph StateGraph — judge 노드 + 조건부 라우팅 (`rag_graph.py`)
-- 0.3.1: LangGraph ReAct Agent — bind_tools + ToolNode (`rag_graph.py`) ← **now processing next: FastAPI**
+- 0.3.1: LangGraph ReAct Agent — bind_tools + ToolNode (`rag_graph.py`)
+- 0.4.0: FastAPI + 프론트엔드 (`main.py`, `index.html`)
+- 0.5.0: Docker + EC2 배포 + GitHub Actions CI/CD
+- 0.6.0: 코드리뷰 QLoRA + vLLM 서빙 (`code_review/`) ← **now processing**
 
 ### Minor Version (0.N.x) — LLM Provider
 - 0.0.x: Gemini API (`gemini-2.5-flash`, `gemini-embedding-001`) 기반 구현 ← **now processing**
@@ -133,38 +174,46 @@ uv run evaluate.py
 # 3. LangChain 기반 RAG 실행
 uv run rag_lc.py
 
-# 4. LangGraph StateGraph 실행 (judge + 조건부 라우팅)
+# 4. LangGraph ReAct Agent 실행 (bind_tools + ToolNode)
 uv run rag_graph.py
 
-# 5. LangGraph ReAct Agent 실행 (bind_tools + ToolNode)
-uv run rag_graph.py
-
-# 6. FastAPI 서버
+# 5. FastAPI 서버
 uv run uvicorn main:app --host 0.0.0.0 --port 8000
 
-# 7. Docker로 실행
+# 6. Docker로 실행
 docker compose up -d
 ```
 
+코드리뷰 확장 프로젝트 실행은 [`code_review/README.md`](code_review/README.md) 참고.
 
-## 배포된 서버
+### 배포된 서버
+
 ```
-http://32.236.37.151:8000/docs
+http://<EC2 퍼블릭 IP>:8000/docs
 ```
-- 인스턴스 중지 상태로 인한 재시작시 변결 될 예정
+
+EC2 인스턴스를 중지 후 재시작하면 퍼블릭 IP가 변경됩니다 (Elastic IP 미적용).
+
 ---
 
 ## Data Source
 
 ### 지식 베이스
-1. 개인 TIL(Today I Learned) 마크다운 문서 42개
+
+1. **개인 TIL 마크다운 문서 42개** (til-rag)
    - 부트캠프 학습 기록 (Python, ML/DL, RAG, LangChain, LangGraph 등)
    - `til_notes/` 디렉토리에 위치
    - 전처리 후 299개 청크로 분할, `chroma_db/`에 인덱싱
 
+2. **GitHub PR 리뷰 코멘트 1334개** (code_review)
+   - 5개 오픈소스 저장소의 merge된 PR에서 GitHub API로 수집
+   - `code_review/data/`에 위치, `code_review_db/`에 인덱싱
+
 ---
 
-## 앞으로의 계획 (개인 프로젝트 외 커리큘럼)
+## 앞으로의 계획
 
-- 프론트엔드 부분
-- TIL -> 야구로 데이터 바꿔서 재학습 시킨 후 구조 다시 짜보기
+- 코드리뷰 모델 재학습 (확대된 데이터 1334개 기준, 학습 파라미터 재조정)
+- 프론트엔드 개선 (대화 초기화 기능, 두 입력 영역 통합 정리)
+- Elastic IP 적용으로 배포 주소 고정
+- 자동화된 테스트 코드 작성 → CI 파이프라인에 test Job 추가
