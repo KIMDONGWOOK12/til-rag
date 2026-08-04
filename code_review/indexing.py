@@ -24,6 +24,7 @@ collection = client_db.get_or_create_collection(
 )
 
 batch_size = 20
+
 for i in range(0, len(data), batch_size):
     batch = data[i:i+batch_size]
     texts = [f"[코드]\n{item.get('code','')}\n\n[리뷰]\n{item['review']}" for item in batch]

@@ -1,13 +1,22 @@
 from github import Github
 import json
 import os
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
 g = Github(os.environ["GITHUB_TOKEN"])
 
-repo_names = ["langchain-ai/langgraph", "langchain-ai/langchain"]
+repo_names = [
+    "langchain-ai/langgraph",
+    "langchain-ai/langchain",
+    "pallets/flask",
+    "psf/requests",
+    "tiangolo/fastapi",
+]
+
 dataset = []
+PR_LIMIT_PER_REPO = 500
 
 for repo_name in repo_names:
     repo = g.get_repo(repo_name)
@@ -19,33 +28,25 @@ for repo_name in repo_names:
         if not pr.merged:
             continue
         checked += 1
-        if checked > 300:
+        if checked > PR_LIMIT_PER_REPO:
             break
 
         try:
-            # 코드 라인에 달린 리뷰 코멘트
             for comment in pr.get_review_comments():
-                if len(comment.body) > 20:
-                    dataset.append({
-                        "repo": repo_name,
-                        "type": "review_comment",
-                        "file": comment.path,
-                        "code": comment.diff_hunk,
-                        "review": comment.body,
-                    })
-                    repo_collected += 1
-
-            # PR 전체에 대한 일반 코멘트
-            for comment in pr.get_issue_comments():
-                if len(comment.body) > 20:
-                    dataset.append({
-                        "repo": repo_name,
-                        "type": "issue_comment",
-                        "file": None,
-                        "code": None,
-                        "review": comment.body,
-                    })
-                    repo_collected += 1
+                body = comment.body.strip()
+                # 너무 짧거나 (LGTM류) 코드가 없으면 제외
+                if len(body) < 30:
+                    continue
+                if not comment.diff_hunk or len(comment.diff_hunk) < 20:
+                    continue
+                dataset.append({
+                    "repo": repo_name,
+                    "type": "review_comment",
+                    "file": comment.path,
+                    "code": comment.diff_hunk,
+                    "review": body,
+                })
+                repo_collected += 1
         except Exception as e:
             print(f"{repo_name} PR #{pr.number} 스킵: {e}")
 

@@ -21,7 +21,7 @@ from datasets import load_dataset
 drive.mount('/content/drive')
 
 DATA_PATH = "/content/drive/MyDrive/code_review_qlora/training_data.jsonl"
-ADAPTER_SAVE_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-qlora"
+ADAPTER_SAVE_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-qlora-v2"
 
 model_id = "Qwen/Qwen2.5-1.5B-Instruct"
 
@@ -61,10 +61,10 @@ trainer = SFTTrainer(
     model=model,
     args=SFTConfig(
         output_dir="./code-review-qlora-output",
-        max_steps=60,
+        max_steps=25,
         per_device_train_batch_size=2,
         gradient_accumulation_steps=4,
-        learning_rate=2e-4,
+        learning_rate=1e-4,
         warmup_ratio=0.03,
         logging_steps=5,
         bf16=True,

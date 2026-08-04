@@ -2,23 +2,30 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from openai import OpenAI
-from retriever import retriever, format_docs
+from retriever import get_relevant_context
 
 VLLM_URL = "https://democrat-tiring-greedily.ngrok-free.dev/v1"
-MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged"
+MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged-v2"
 
 client = OpenAI(base_url=VLLM_URL, api_key="not-needed")
 
 def review_code(code: str) -> str:
-    docs = retriever.invoke(code)
-    context = format_docs(docs)
+    context = get_relevant_context(code)
 
-    prompt = (
-        "아래는 과거의 유사한 코드 리뷰 사례입니다:\n\n"
-        + context
-        + "\n\n이 사례들을 참고해서, 다음 코드를 리뷰해줘:\n\n"
-        + "```\n" + code + "\n```"
-    )
+    if context:
+        prompt = (
+            "다음 코드를 리뷰해줘:\n\n"
+            + "```\n" + code + "\n```\n\n"
+            + "참고로, 아래는 과거에 있었던 유사한 코드 리뷰 사례들이야. "
+            + "이 사례들의 리뷰 스타일과 관점만 참고하고, "
+            + "반드시 위에서 제시한 코드에 대해서만 리뷰해:\n\n"
+            + context
+        )
+    else:
+        prompt = (
+            "다음 코드를 리뷰해줘:\n\n"
+            + "```\n" + code + "\n```"
+        )
 
     response = client.chat.completions.create(
         model=MODEL_PATH,

@@ -21,7 +21,7 @@ from google.colab import drive
 
 drive.mount('/content/drive')
 
-MERGED_MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged"
+MERGED_MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged-v2"
 
 env = os.environ.copy()
 env["VLLM_USE_V1"] = "0"

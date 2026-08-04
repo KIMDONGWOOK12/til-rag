@@ -13,8 +13,8 @@ from peft import PeftModel
 drive.mount('/content/drive')
 
 model_id = "Qwen/Qwen2.5-1.5B-Instruct"
-ADAPTER_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-qlora"
-MERGED_SAVE_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged"
+ADAPTER_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-qlora-v2"
+MERGED_SAVE_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged-v2"
 
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 
