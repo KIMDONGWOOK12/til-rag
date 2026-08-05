@@ -5,7 +5,7 @@ from openai import OpenAI
 from retriever import get_relevant_context
 
 VLLM_URL = "https://democrat-tiring-greedily.ngrok-free.dev/v1"
-MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged-v2"
+MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged-v3"
 
 client = OpenAI(base_url=VLLM_URL, api_key="not-needed")
 
@@ -26,6 +26,8 @@ def review_code(code: str) -> str:
             "다음 코드를 리뷰해줘:\n\n"
             + "```\n" + code + "\n```"
         )
+
+    prompt += "\n\n반드시 한국어로 답변해줘."
 
     response = client.chat.completions.create(
         model=MODEL_PATH,

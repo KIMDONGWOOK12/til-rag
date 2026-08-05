@@ -1,7 +1,6 @@
 from github import Github
 import json
 import os
-import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,11 +16,13 @@ repo_names = [
 
 dataset = []
 PR_LIMIT_PER_REPO = 500
+MAX_CODE_LENGTH = 1000  # 이 이상이면 잘라내기
 
 for repo_name in repo_names:
     repo = g.get_repo(repo_name)
     checked = 0
     repo_collected = 0
+    repo_truncated = 0
 
     prs = repo.get_pulls(state="closed", sort="created", direction="asc")
     for pr in prs:
@@ -34,23 +35,28 @@ for repo_name in repo_names:
         try:
             for comment in pr.get_review_comments():
                 body = comment.body.strip()
-                # 너무 짧거나 (LGTM류) 코드가 없으면 제외
                 if len(body) < 30:
                     continue
-                if not comment.diff_hunk or len(comment.diff_hunk) < 20:
+                diff = comment.diff_hunk
+                if not diff or len(diff) < 20:
                     continue
+
+                if len(diff) > MAX_CODE_LENGTH:
+                    diff = diff[:MAX_CODE_LENGTH] + "\n... (생략)"
+                    repo_truncated += 1
+
                 dataset.append({
                     "repo": repo_name,
                     "type": "review_comment",
                     "file": comment.path,
-                    "code": comment.diff_hunk,
+                    "code": diff,
                     "review": body,
                 })
                 repo_collected += 1
         except Exception as e:
             print(f"{repo_name} PR #{pr.number} 스킵: {e}")
 
-    print(f"{repo_name}: merge된 PR {checked}개에서 코멘트 {repo_collected}개 수집")
+    print(f"{repo_name}: merge된 PR {checked}개에서 코멘트 {repo_collected}개 수집 (그중 {repo_truncated}개 잘림)")
 
 print(f"\n전체 합계: {len(dataset)}개")
 

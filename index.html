@@ -7,35 +7,41 @@
 <style>
   :root {
     color-scheme: light dark;
-    --bg: #f5f6f8;
+    --page-bg: #f5f6f8;
     --panel: #ffffff;
-    --border: #e2e4e9;
-    --text: #1a1c22;
-    --muted: #6b7280;
-    --accent: #2563eb;
-    --accent-fg: #ffffff;
-    --bubble-user: #2563eb;
-    --bubble-user-fg: #ffffff;
-    --bubble-bot: #eef1f5;
-    --bubble-bot-fg: #1a1c22;
-    --source-bg: #eef2ff;
-    --source-fg: #3730a3;
+    --chat-bg: #b2c7da;
+    --input-fill: #eef0ef;
+    --text: #241f1a;
+    --muted: #7c7466;
+    --kakao-yellow: #fee500;
+    --bubble-user: #fee500;
+    --bubble-user-fg: #391b1b;
+    --bubble-bot: #ffffff;
+    --bubble-bot-fg: #241f1a;
+    --bubble-shadow: 0 1px 3px rgba(20, 30, 40, 0.16);
+    --source-bg: #fff3c4;
+    --source-fg: #8a6d00;
+    --error-bg: #ffe3e3;
+    --error-fg: #a3312a;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #0f1115;
-      --panel: #171a21;
-      --border: #2a2e37;
-      --text: #e6e8ec;
-      --muted: #9aa0ab;
-      --accent: #3b82f6;
-      --accent-fg: #ffffff;
-      --bubble-user: #3b82f6;
-      --bubble-user-fg: #ffffff;
-      --bubble-bot: #232733;
-      --bubble-bot-fg: #e6e8ec;
-      --source-bg: #1e2338;
-      --source-fg: #a5b4fc;
+      --page-bg: #121212;
+      --panel: #1c1c1e;
+      --chat-bg: #28323c;
+      --input-fill: #2b2b2d;
+      --text: #f1ede6;
+      --muted: #a39a8c;
+      --kakao-yellow: #e0c200;
+      --bubble-user: #e0c200;
+      --bubble-user-fg: #241d10;
+      --bubble-bot: #2f2f31;
+      --bubble-bot-fg: #f1ede6;
+      --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+      --source-bg: #3a3120;
+      --source-fg: #e0c200;
+      --error-bg: #3a2222;
+      --error-fg: #ff9d92;
     }
   }
 
@@ -44,9 +50,9 @@
   body {
     margin: 0;
     min-height: 100vh;
-    background: var(--bg);
+    background: var(--page-bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: "Apple SD Gothic Neo", "Malgun Gothic", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     display: flex;
     justify-content: center;
     padding: 24px 16px;
@@ -59,37 +65,121 @@
     flex-direction: column;
     height: calc(100vh - 48px);
     background: var(--panel);
-    border: 1px solid var(--border);
     border-radius: 16px;
     overflow: hidden;
   }
 
   header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
+    padding: 14px 18px;
+    background: var(--panel);
+    box-shadow: 0 1px 4px rgba(20, 20, 20, 0.06);
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  header .header-text {
+    min-width: 0;
   }
 
   header h1 {
     margin: 0;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
   }
 
   header p {
-    margin: 4px 0 0;
-    font-size: 13px;
+    margin: 2px 0 0;
+    font-size: 12px;
     color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  header .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .mode-toggle {
+    position: relative;
+    display: flex;
+    min-width: 176px;
+    background: rgba(124, 116, 102, 0.14);
+    border-radius: 999px;
+    padding: 3px;
+  }
+
+  .mode-toggle .mode-indicator {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: calc(50% - 3px);
+    background: var(--kakao-yellow);
+    border-radius: 999px;
+    transition: transform 0.2s ease;
+  }
+
+  .mode-toggle[data-mode="review"] .mode-indicator {
+    transform: translateX(100%);
+  }
+
+  .mode-btn {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 999px;
+    white-space: nowrap;
+    text-align: center;
+    transition: color 0.2s ease;
+  }
+
+  .mode-btn.active {
+    color: var(--bubble-user-fg);
+  }
+
+  .btn-ghost {
+    flex-shrink: 0;
+    border: none;
+    border-radius: 999px;
+    padding: 7px 12px;
+    background: rgba(124, 116, 102, 0.12);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .btn-ghost:hover {
+    background: rgba(124, 116, 102, 0.22);
+    color: var(--text);
   }
 
   #messages {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
+    padding: 22px 18px;
+    background: var(--chat-bg);
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
     scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    scrollbar-color: rgba(20, 30, 40, 0.25) transparent;
   }
 
   #messages::-webkit-scrollbar {
@@ -101,27 +191,27 @@
   }
 
   #messages::-webkit-scrollbar-thumb {
-    background-color: var(--border);
+    background-color: rgba(20, 30, 40, 0.25);
     border-radius: 8px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
 
   #messages::-webkit-scrollbar-thumb:hover {
-    background-color: var(--muted);
+    background-color: rgba(20, 30, 40, 0.4);
     background-clip: padding-box;
   }
 
   #messages:empty::before {
-    content: "TIL에 대해 궁금한 걸 물어보세요.";
-    color: var(--muted);
+    content: attr(data-empty-hint);
+    color: rgba(36, 31, 26, 0.55);
     font-size: 14px;
   }
 
   .msg {
     display: flex;
     flex-direction: column;
-    max-width: 82%;
+    max-width: 78%;
   }
 
   .msg.user { align-self: flex-end; align-items: flex-end; }
@@ -129,8 +219,7 @@
 
   .bubble {
     padding: 10px 14px;
-    border-radius: 14px;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.5;
     white-space: pre-wrap;
     word-break: break-word;
@@ -139,18 +228,25 @@
   .msg.user .bubble {
     background: var(--bubble-user);
     color: var(--bubble-user-fg);
-    border-bottom-right-radius: 4px;
+    border-radius: 18px 18px 4px 18px;
   }
 
   .msg.bot .bubble {
     background: var(--bubble-bot);
     color: var(--bubble-bot-fg);
-    border-bottom-left-radius: 4px;
+    box-shadow: var(--bubble-shadow);
+    border-radius: 18px 18px 18px 4px;
   }
 
   .msg.bot .bubble.error {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--error-bg);
+    color: var(--error-fg);
+    box-shadow: none;
+  }
+
+  .bubble a {
+    color: inherit;
+    text-decoration: underline;
   }
 
   .sources {
@@ -162,7 +258,7 @@
 
   .source-tag {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     padding: 3px 8px;
     border-radius: 999px;
     background: var(--source-bg);
@@ -193,65 +289,70 @@
 
   form {
     display: flex;
+    align-items: flex-end;
     gap: 8px;
-    padding: 14px;
-    border-top: 1px solid var(--border);
+    padding: 12px 14px;
+    background: var(--panel);
+    box-shadow: 0 -1px 4px rgba(20, 20, 20, 0.06);
+    position: relative;
+    z-index: 2;
   }
 
-  #question {
+  .textarea-field {
     flex: 1;
     resize: none;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    padding: 10px 16px;
     font-size: 14px;
     line-height: 1.5;
     font-family: inherit;
-    background: var(--bg);
+    background: var(--input-fill);
     color: var(--text);
     max-height: 120px;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    scrollbar-color: var(--muted) transparent;
   }
 
-  #question::-webkit-scrollbar {
+  .textarea-field::-webkit-scrollbar {
     width: 6px;
   }
 
-  #question::-webkit-scrollbar-track {
+  .textarea-field::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  #question::-webkit-scrollbar-thumb {
-    background-color: var(--border);
+  .textarea-field::-webkit-scrollbar-thumb {
+    background-color: rgba(124, 116, 102, 0.4);
     border-radius: 8px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
 
-  #question::-webkit-scrollbar-thumb:hover {
-    background-color: var(--muted);
-    background-clip: padding-box;
-  }
-
-  #question:focus {
+  .textarea-field:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--kakao-yellow);
+    box-shadow: 0 0 0 3px rgba(254, 229, 0, 0.25);
   }
 
-  button#send {
+  .btn-send {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
     border: none;
-    border-radius: 10px;
-    padding: 0 18px;
-    background: var(--accent);
-    color: var(--accent-fg);
-    font-size: 14px;
-    font-weight: 600;
+    border-radius: 50%;
+    background: var(--kakao-yellow);
+    color: var(--bubble-user-fg);
+    font-size: 12px;
+    font-weight: 700;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  button#send:disabled {
+  .btn-send:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
@@ -260,23 +361,75 @@
 <body>
   <div class="app">
     <header>
-      <h1>TIL RAG 챗봇</h1>
-      <p>개인 학습 기록(TIL)을 근거로 답변합니다.</p>
+      <div class="header-text">
+        <h1>TIL RAG 챗봇</h1>
+        <p id="header-subtitle">개인 학습 기록(TIL)을 근거로 답변합니다.</p>
+      </div>
+      <div class="header-actions">
+        <div class="mode-toggle" id="mode-toggle" data-mode="til">
+          <span class="mode-indicator"></span>
+          <button class="mode-btn active" id="mode-til-btn" type="button" data-mode="til">TIL</button>
+          <button class="mode-btn" id="mode-review-btn" type="button" data-mode="review">코드리뷰</button>
+        </div>
+        <button id="clear-btn" class="btn-ghost" type="button">지우기</button>
+      </div>
     </header>
 
-    <div id="messages"></div>
+    <div id="messages" data-empty-hint="TIL에 대해 궁금한 걸 물어보세요."></div>
 
     <form id="chat-form">
-      <textarea id="question" rows="1" placeholder="질문을 입력하세요..." autofocus></textarea>
-      <button id="send" type="submit">전송</button>
+      <textarea id="user-input" class="textarea-field" rows="1" placeholder="TIL에 대해 물어보세요" autofocus></textarea>
+      <button id="send-btn" class="btn-send" type="submit">전송</button>
     </form>
   </div>
 
 <script>
+  const MODE_CONFIG = {
+    til: {
+      subtitle: '개인 학습 기록(TIL)을 근거로 답변합니다.',
+      placeholder: 'TIL에 대해 물어보세요',
+      buttonLabel: '전송',
+      emptyHint: 'TIL에 대해 궁금한 걸 물어보세요.',
+    },
+    review: {
+      subtitle: '붙여넣은 코드를 리뷰해드립니다.',
+      placeholder: '리뷰받을 코드를 입력하세요',
+      buttonLabel: '리뷰',
+      emptyHint: '리뷰받을 코드를 붙여넣어보세요.',
+    },
+  };
+
+  let currentMode = 'til';
+
   const form = document.getElementById('chat-form');
-  const input = document.getElementById('question');
-  const sendBtn = document.getElementById('send');
+  const input = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
   const messages = document.getElementById('messages');
+  const headerSubtitle = document.getElementById('header-subtitle');
+  const modeToggle = document.getElementById('mode-toggle');
+  const modeTilBtn = document.getElementById('mode-til-btn');
+  const modeReviewBtn = document.getElementById('mode-review-btn');
+
+  function setMode(mode) {
+    currentMode = mode;
+    const cfg = MODE_CONFIG[mode];
+
+    modeToggle.dataset.mode = mode;
+    modeTilBtn.classList.toggle('active', mode === 'til');
+    modeReviewBtn.classList.toggle('active', mode === 'review');
+
+    headerSubtitle.textContent = cfg.subtitle;
+    input.placeholder = cfg.placeholder;
+    sendBtn.textContent = cfg.buttonLabel;
+    messages.dataset.emptyHint = cfg.emptyHint;
+
+    input.value = '';
+    input.style.height = 'auto';
+    input.focus();
+  }
+
+  modeTilBtn.addEventListener('click', () => setMode('til'));
+  modeReviewBtn.addEventListener('click', () => setMode('review'));
 
   function scrollToBottom() {
     messages.scrollTop = messages.scrollHeight;
@@ -301,7 +454,12 @@
     return el;
   }
 
-  const DOC_REF_RE = /\[(\d{2}-\d{2}-\d{2}(?:_\d+)?\.md)\]/g;
+  // 파일명 하나: 26-06-15.md, 26-05-15_1.md 등
+  const FILENAME_SRC = '\\d{2}-\\d{2}-\\d{2}(?:_\\d+)?\\.md';
+  // 대괄호 그룹 전체: [26-06-15.md] 처럼 하나만 있을 수도, [26-06-15.md, 26-06-18.md]
+  // 처럼 LLM이 한 대괄호에 콤마로 여러 개를 몰아넣을 수도 있어서 둘 다 매치한다.
+  const DOC_REF_GROUP_RE = new RegExp(`\\[(${FILENAME_SRC}(?:\\s*,\\s*${FILENAME_SRC})*)\\]`, 'g');
+  const FILENAME_RE = new RegExp(FILENAME_SRC, 'g');
 
   function escapeHtml(str) {
     return str.replace(/[&<>"']/g, (c) => ({
@@ -309,18 +467,22 @@
     }[c]));
   }
 
-  // answer 텍스트에서 [26-06-15.md] 같은 패턴을 찾아 출처 태그로 뽑아낸다.
+  // answer 텍스트에서 [26-06-15.md] / [26-06-15.md, 26-06-18.md] 같은 패턴을
+  // 찾아 안의 파일명들을 전부 출처 태그로 뽑아낸다.
   function extractSources(text) {
-    const matches = text.match(DOC_REF_RE) || [];
-    const unique = [...new Set(matches.map(m => m.slice(1, -1)))];
-    return unique;
+    const groups = text.match(DOC_REF_GROUP_RE) || [];
+    const all = groups.flatMap((g) => g.match(FILENAME_RE) || []);
+    return [...new Set(all)];
   }
 
-  // answer 텍스트를 이스케이프한 뒤, [26-06-15.md] 패턴만 새 탭 링크로 바꾼다.
+  // answer 텍스트를 이스케이프한 뒤, 대괄호 그룹 안의 파일명들을 각각 새 탭 링크로 바꾼다.
   function linkifyDocRefs(text) {
-    return escapeHtml(text).replace(DOC_REF_RE, (match, filename) =>
-      `[<a href="/docs/${filename}" target="_blank" rel="noopener">${filename}</a>]`
-    );
+    return escapeHtml(text).replace(DOC_REF_GROUP_RE, (match, inner) => {
+      const linked = inner.replace(FILENAME_RE, (filename) =>
+        `<a href="/docs/${filename}" target="_blank" rel="noopener">${filename}</a>`
+      );
+      return `[${linked}]`;
+    });
   }
 
   function renderBotMessage(el, text, isError) {
@@ -342,16 +504,20 @@
     scrollToBottom();
   }
 
-  async function sendQuestion(question) {
-    addUserMessage(question);
+  async function sendMessage(text) {
+    const isReview = currentMode === 'review';
+    addUserMessage(isReview ? `코드 리뷰 요청:\n${text}` : text);
     const typingEl = addTypingIndicator();
 
     sendBtn.disabled = true;
     try {
-      const res = await fetch('/ask', {
+      const endpoint = isReview ? '/review' : '/ask';
+      const body = isReview ? { code: text } : { question: text };
+
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {
@@ -359,7 +525,8 @@
       }
 
       const data = await res.json();
-      renderBotMessage(typingEl, data.answer ?? '(빈 응답)', false);
+      const resultText = isReview ? data.review : data.answer;
+      renderBotMessage(typingEl, resultText ?? '(빈 응답)', false);
     } catch (err) {
       renderBotMessage(typingEl, `오류가 발생했습니다: ${err.message}`, true);
     } finally {
@@ -369,15 +536,18 @@
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const question = input.value.trim();
-    if (!question) return;
+    const text = input.value.trim();
+    if (!text) return;
     input.value = '';
     input.style.height = 'auto';
-    sendQuestion(question);
+    sendMessage(text);
   });
 
   input.addEventListener('keydown', (e) => {
     if (e.isComposing || e.keyCode === 229) return;
+    // 코드리뷰 모드에서는 Enter가 줄바꿈만 하고, 제출은 버튼으로만 한다
+    // (안 그러면 코드를 여러 줄 치는 도중 계속 전송돼버림).
+    if (currentMode !== 'til') return;
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       form.requestSubmit();
@@ -387,6 +557,11 @@
   input.addEventListener('input', () => {
     input.style.height = 'auto';
     input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  });
+
+  const clearBtn = document.getElementById('clear-btn');
+  clearBtn.addEventListener('click', () => {
+    messages.innerHTML = '';
   });
 </script>
 </body>

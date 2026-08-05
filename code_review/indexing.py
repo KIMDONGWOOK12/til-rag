@@ -23,9 +23,11 @@ collection = client_db.get_or_create_collection(
     name="code_review", metadata={"hnsw:space": "cosine"}
 )
 
-batch_size = 20
+already_saved = collection.count()
+print(f"이미 저장된 개수: {already_saved}, 전체: {len(data)}")
 
-for i in range(0, len(data), batch_size):
+batch_size = 20
+for i in range(already_saved, len(data), batch_size):
     batch = data[i:i+batch_size]
     texts = [f"[코드]\n{item.get('code','')}\n\n[리뷰]\n{item['review']}" for item in batch]
     embeddings = embed_texts(texts)
