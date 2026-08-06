@@ -12,7 +12,7 @@ from retriever import get_relevant_context
 
 # ── vLLM 클라이언트 (학습시킨 리뷰 생성 모델) ─────────────────
 VLLM_URL = "https://democrat-tiring-greedily.ngrok-free.dev/v1"
-MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged-v4"
+MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged-v5"
 vllm_client = OpenAI(base_url=VLLM_URL, api_key="not-needed")
 
 # ── Anthropic 클라이언트 (판단 전용, 안정적인 모델) ────────────────
@@ -95,7 +95,7 @@ def judge_review(state: ReviewState) -> dict:
 
 def route_after_judge(state: ReviewState) -> str:
     if state["is_relevant"]:
-        return "end"
+        return "translate"      # end 대신 translate로 수정
     if state["attempts"] >= MAX_ATTEMPTS:
         return "fallback"
     return "retry"
@@ -108,17 +108,39 @@ def fallback_response(state: ReviewState) -> dict:
                    "다른 방식으로 코드를 다시 붙여넣어 주시면 감사하겠습니다."
     }
 
+def translate_review(state: ReviewState) -> dict:
+    """적절하다고 판단된 리뷰를 자연스러운 한국어로 다듬는 노드."""
+    review = state["review"]
+
+    translate_prompt = f"""다음은 코드 리뷰 내용입니다. 이 내용을 자연스러운 한국어로
+정리해서 다시 작성해주세요. 코드 블록(```)이 있다면 그대로 유지하고,
+설명 부분만 한국어로 작성하세요. 원래 내용의 의미는 그대로 유지해야 합니다.
+
+[리뷰 내용]
+{review}
+
+한국어로 정리된 리뷰만 출력하세요."""
+
+    response = anthropic_client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=300,
+        messages=[{"role": "user", "content": translate_prompt}],
+    )
+    return {"review": response.content[0].text.strip()}
 
 builder = StateGraph(ReviewState)
 builder.add_node("generate", generate_review)
 builder.add_node("judge", judge_review)
+builder.add_node("translate", translate_review)
 builder.add_node("fallback", fallback_response)
 
 builder.add_edge(START, "generate")
 builder.add_edge("generate", "judge")
 builder.add_conditional_edges(
-    "judge", route_after_judge, {"retry": "generate", "end": END, "fallback": "fallback"}
+    "judge", route_after_judge,
+    {"retry": "generate", "translate": "translate", "fallback": "fallback"}
 )
+builder.add_edge("translate", END)
 builder.add_edge("fallback", END)
 
 graph = builder.compile()

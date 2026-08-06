@@ -12,7 +12,7 @@ from rag_graph import graph
 # code_review 폴더 자체를 sys.path에 얹어 최상위 모듈처럼 불러온다.
 CODE_REVIEW_DIR = Path(__file__).parent / "code_review"
 sys.path.insert(0, str(CODE_REVIEW_DIR))
-from rag_review import review_code
+from code_review.review_graph import review_code_with_judge as review_code
 
 app = FastAPI()
 
