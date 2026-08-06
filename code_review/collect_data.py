@@ -7,11 +7,23 @@ load_dotenv()
 g = Github(os.environ["GITHUB_TOKEN"])
 
 repo_names = [
+    # 기존 5개
     "langchain-ai/langgraph",
     "langchain-ai/langchain",
     "pallets/flask",
     "psf/requests",
     "tiangolo/fastapi",
+    # 추가 10개
+    "django/django",                    # 웹 프레임워크
+    "pandas-dev/pandas",                 # 데이터 처리
+    "numpy/numpy",                       # 수치 연산
+    "scikit-learn/scikit-learn",         # ML
+    "python-poetry/poetry",              # 패키지 관리
+    "sqlalchemy/sqlalchemy",             # ORM
+    "celery/celery",                     # 비동기 작업 큐
+    "pallets/click",                     # CLI 도구
+    "huggingface/transformers",          # NLP/딥러닝
+    "encode/django-rest-framework",      # REST API
 ]
 
 dataset = []

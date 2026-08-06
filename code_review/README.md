@@ -26,6 +26,9 @@ GPU가 필요한 학습·병합·서빙은 Colab에서 실행하고, 결과 코�
 
 **같은 데이터를 두 갈래로 재사용**하는 것이 이 프로젝트의 구조적 특징입니다.
 
+
+
+
 ```
 sample_data.json (1334개)
     ├─→ convert_format.py → training_data.jsonl → QLoRA 학습 (생성 능력)
