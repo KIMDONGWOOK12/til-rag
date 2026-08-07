@@ -12,7 +12,7 @@ from retriever import get_relevant_context
 
 # ── vLLM 클라이언트 (학습시킨 리뷰 생성 모델) ─────────────────
 VLLM_URL = "https://democrat-tiring-greedily.ngrok-free.dev/v1"
-MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged-v5"
+MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged-v7"
 vllm_client = OpenAI(base_url=VLLM_URL, api_key="not-needed")
 
 # ── Anthropic 클라이언트 (판단 전용, 안정적인 모델) ────────────────

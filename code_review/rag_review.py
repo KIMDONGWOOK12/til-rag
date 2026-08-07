@@ -5,7 +5,7 @@ from openai import OpenAI
 from retriever import get_relevant_context
 
 VLLM_URL = "https://democrat-tiring-greedily.ngrok-free.dev/v1"
-MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged-v4"
+MODEL_PATH = "/content/drive/MyDrive/code_review_qlora/qwen-code-review-merged-v7"
 
 client = OpenAI(base_url=VLLM_URL, api_key="not-needed")
 
