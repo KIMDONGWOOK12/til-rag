@@ -51,6 +51,7 @@ def generate_review(state: ReviewState) -> dict:
         model=MODEL_PATH,
         messages=[{"role": "user", "content": prompt}],
         max_tokens=200,
+        temperature=0.3,
     )
     review = response.choices[0].message.content
 

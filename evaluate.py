@@ -43,7 +43,7 @@ def generate(contexts, question):
     질문 : {question}"""
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=prompt
+        model="gemini-2.0-flash", contents=prompt
     )
     return response.text.strip()
 
@@ -241,7 +241,7 @@ def llm_judge(metric, question, ground_truth, contexts, answer):
     }
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=prompts[metric]
+        model="gemini-2.0-flash", contents=prompts[metric]
     )
     try:
         return float(response.text.strip())

@@ -21,7 +21,7 @@
 | 0 | Chunking | 고정 길이 분할 (chunk_size=500, overlap=50) | ✅ |
 | 0 | 인덱싱 | Gemini 임베딩 + ChromaDB (299청크, `collection_name="til_rag"`) | ✅ |
 | 1 | 순수 RAG 구현 | `retrieve()` / `generate()` 직접 구현 (`rag.py`) | ✅ |
-| 1 | 프롬프트 설계 | 5원칙 (근거 문서만 사용 / 모르면 거절 / 출처 표시 / 3문장 제한) | ✅ |
+| 1 | 프롬프트 설계 | 5원칙 (근거 문서만 사용 / 한국어 답변 / 모르면 거절 / 출처 표시 / 3문장 제한) | ✅ |
 | 1 | 환각 방지 검증 | 무관 질문(김치찌개 레시피) 시 "찾을 수 없음" 응답 확인 | ✅ |
 | 1 | RAG 평가 | `evaluate.py` — 규칙 기반 vs LLM-as-Judge 비교 | ✅ |
 | 2 | LangChain 마이그레이션 | 기존 Chroma 인덱스 재오픈 (재인덱싱 없이 전환) (`rag_lc.py`) | ✅ |
@@ -44,7 +44,8 @@
 | 8 | 코드리뷰 QLoRA 학습 | v1~v7 반복 (베이스 모델·데이터·steps 조정) | ✅ |
 | 8 | vLLM 서빙 | OpenAI 호환 API, ngrok 외부 노출 | ✅ |
 | 8 | RAG + LangGraph 검증 | threshold 필터 + judge/translate/fallback 노드 | ✅ |
-| 8 | 코드리뷰 기능 EC2 반영 | Docker 재빌드 → 배포 | 🔄 진행 중 |
+| 8 | 코드리뷰 기능 EC2 반영 | 데모용 구성(Colab vLLM 의존) | ✅ |
+| 8 | 모델 안정성 개선 | 데이터 정제 + 정적 분석 하이브리드 | 📋 계획 |
 
 ---
 
@@ -135,8 +136,37 @@ TIL-RAG와 같은 RAG 구조를 **다른 도메인**에 적용하고,
 
 **핵심 발견**: 데이터량 확충(v3)과 **코드 특화 베이스 모델로의 교체(v6→v7)**가 정확도를
 좌우했으며, 코드 특화 모델은 과적합이 쉬워 학습 강도(steps) 조절이 중요했습니다.
+단, v7은 반복 테스트에서 출력 불안정성이 확인되어, 이를 "검증 레이어의 필요성을
+실증한 한계"로 기록하고 후속 개선(데이터 정제, 정적 분석 도구 결합)을 계획했습니다.
 
 자세한 내용은 [`code_review/README.md`](code_review/README.md) 참고.
+
+
+---
+
+
+### 평가 (LLM-as-Judge, Gemini + Claude 이중 채점)
+
+동일 코드 3종에 대한 버전별 리뷰를 Gemini와 Claude 두 모델로 각각 채점한 결과,
+v5(Gemini 3.33 / Claude 3.50)와 v7(Gemini 3.33 / Claude 3.00)이 근접한
+최상위권을 보였고, v6(Gemini 2.00 / Claude 2.00, 두 평가자 완전 일치)는
+SQL 인젝션에는 강하나 다른 케이스에서 불안정해 과적합 가설을 뒷받침했습니다.
+자세한 채점 결과는 [`code_review/README.md`](code_review/README.md) 참고.
+
+---
+
+## Version
+
+### Patch Version — Development Stage
+- 0.1.0: 순수 RAG 구현 — TIL 42개, 299청크 인덱싱, 환각 방지 검증
+- 0.2.0: LangChain 마이그레이션 — LCEL 체인
+- 0.3.0: LangGraph StateGraph — judge 노드 + 조건부 라우팅
+- 0.3.1: LangGraph ReAct Agent — bind_tools + ToolNode
+- 0.4.0: FastAPI + 프론트엔드
+- 0.5.0: Docker + EC2 배포 + GitHub Actions CI/CD
+- 0.6.0: 코드리뷰 QLoRA + vLLM + LangGraph 검증 (v7: Qwen2.5-Coder-7B, 6529개) ← now processing
+### Minor Version (0.N.x) — LLM Provider
+- 0.0.x: Gemini API (`gemini-2.5-flash`, `gemini-embedding-001`) ← **now processing**
 
 ---
 
@@ -171,11 +201,13 @@ docker compose up -d
 ### 배포된 서버
 
 ```
-http://<EC2 퍼블릭 IP>:8000
+http://15.135.88.186:8000   # 현재 퍼블릭 IP (변동 가능)
 ```
 
 EC2 인스턴스를 중지 후 재시작하면 퍼블릭 IP가 변경됩니다 (Elastic IP 미적용).
+IP가 바뀌면 GitHub Actions의 `SERVER_HOST` secret도 함께 갱신해야 자동 배포가 성공합니다.
 코드리뷰 기능은 Colab의 vLLM 서버가 켜져 있을 때만 동작하는 데모용 구성입니다.
+(TIL 질의응답은 EC2 단독으로 상시 동작하지만, 코드리뷰는 Colab 세션이 살아 있을 때만 작동)
 
 ---
 
@@ -192,7 +224,8 @@ EC2 인스턴스를 중지 후 재시작하면 퍼블릭 IP가 변경됩니다 (
 
 ## 앞으로의 계획
 
-- 코드리뷰 기능 EC2 반영 완료 (Docker 재빌드 → 배포)
+- Elastic IP 적용으로 배포 주소 고정 (IP 변동에 따른 CI/CD secret 갱신 문제 해소)
 - 다양한 언어·도메인 저장소 추가로 데이터 편향 완화
-- Elastic IP 적용으로 배포 주소 고정
 - 자동화된 테스트 코드 작성 → CI 파이프라인에 test Job 추가
+
+> 코드리뷰 기능 EC2 반영은 Docker 재빌드 → Docker Hub push → EC2 pull로 완료되었습니다.

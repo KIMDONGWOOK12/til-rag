@@ -33,6 +33,7 @@ def review_code(code: str) -> str:
         model=MODEL_PATH,
         messages=[{"role": "user", "content": prompt}],
         max_tokens=200,
+        temperature=0.3,
     )
     return response.choices[0].message.content
 
